@@ -21,7 +21,7 @@ subscriptionname = "jfarro/house/makerspace/display" # this should be a string t
 # initial variables
 refresh = False  # controls when the frame needs to close aps and start over
 
-imagePath = ""  # path to the current folder of images
+imagePath = "/home/pi/Pictures/usb/Pictures/"  # path to the current folder of images
 webpageEnd = ""  # the 'footer' of the webpage
 refreshInterval = 30  # number of seconds between images in a slideshow
 
@@ -191,6 +191,8 @@ os.system("killall -9 omxplayer.bin")
 MQTTSubscribe()
 
 while True:
+            print("dirs:")
+            print(dirs)
             for file in dirs:
                 print ("Mainloop: Image Path is: " + imagePath + " and has: " + str(len(imagePath)) + " files.")
                 file = "./" + imagePath + "/" + file
@@ -214,15 +216,15 @@ while True:
                     os.system('omxplayer ' + file)
                 if file.upper().endswith(".JPG"):
                     time.sleep(1.0)
-                    os.system("DISPLAY=:0.0 feh -x " + file + "&")
+                    os.system("DISPLAY=:0.0 feh -x '" + file + "' --scale-down --auto-zoom &")
                     count = 0
                     print("Showing: " + file)
                     print("refresh is: " + str(refresh))
                     print("refreshInterval is: " + str(refreshInterval))
                     while refresh is False:
                         time.sleep(1.0)
-                        print("refresh is: " + str(refresh))
-                        print("refreshInterval is: " + str(refreshInterval))
+                        #print("refresh is: " + str(refresh))
+                        #print("refreshInterval is: " + str(refreshInterval))
                         count = count + 1
                         if count > refreshInterval:
                             break
