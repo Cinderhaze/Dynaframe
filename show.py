@@ -23,7 +23,8 @@ refresh = False  # controls when the frame needs to close aps and start over
 
 imagePath = "/home/pi/Pictures/usb/Pictures/"  # path to the current folder of images
 webpageEnd = ""  # the 'footer' of the webpage
-refreshInterval = 30  # number of seconds between images in a slideshow
+refreshInterval = 10  # number of seconds between images in a slideshow
+#refreshInterval = 30  # number of seconds between images in a slideshow
 
 # webpageBody is the main template for the http served webpage. This is where you can make that page..prettier
 webpageBody = '''
@@ -190,6 +191,45 @@ os.system("killall -9 omxplayer.bin")
 
 MQTTSubscribe()
 
+def processDir(dir):
+  print("Dir is: " + dir)
+  files = [os.path.join(path, filename)
+           for path, dirs, files in os.walk(dir)
+           for filename in files
+           #if os.path.splitext(filename)[1] in extensions
+          ]
+  for file in files:
+    processFile(file)
+  
+
+def processFile(file):
+                print("File is: " + file)
+                os.system("killall -9 feh")
+                os.system("killall -9 omxplayer.bin")
+
+                if file.upper().endswith(".MOV"):
+                    os.system('omxplayer ' + file)
+                if file.upper().endswith(".MP4"):
+                    os.system("omxplayer '" + file + "'")
+                if file.upper().endswith(".JPG"):
+                    time.sleep(1.0)
+                    os.system("DISPLAY=:0.0 feh -x '" + file + "' -F &")
+                    #os.system("DISPLAY=:0.0 feh -x '" + file + "' --scale-down --auto-zoom &")
+                    count = 0
+                    print("Showing: " + file)
+                    global refresh
+                    print("refresh is: " + str(refresh))
+                    print("refreshInterval is: " + str(refreshInterval))
+                    while refresh is False:
+                        time.sleep(1.0)
+                        #print("refresh is: " + str(refresh))
+                        #print("refreshInterval is: " + str(refreshInterval))
+                        count = count + 1
+                        if count > refreshInterval:
+                            break
+
+                    refresh = False
+
 while True:
             print("dirs:")
             print(dirs)
@@ -206,27 +246,9 @@ while True:
                 if imagePath == "":
                     quit()
 
-                print("File is: " + file)
-                os.system("killall -9 feh")
-                os.system("killall -9 omxplayer.bin")
+                if(os.path.isdir(file)):
+                  print("whoops, dir:%s" % file)
+                  processDir(file)
+                else:
+                  processFile(file)  
 
-                if file.upper().endswith(".MOV"):
-                    os.system('omxplayer ' + file)
-                if file.upper().endswith(".MP4"):
-                    os.system('omxplayer ' + file)
-                if file.upper().endswith(".JPG"):
-                    time.sleep(1.0)
-                    os.system("DISPLAY=:0.0 feh -x '" + file + "' --scale-down --auto-zoom &")
-                    count = 0
-                    print("Showing: " + file)
-                    print("refresh is: " + str(refresh))
-                    print("refreshInterval is: " + str(refreshInterval))
-                    while refresh is False:
-                        time.sleep(1.0)
-                        #print("refresh is: " + str(refresh))
-                        #print("refreshInterval is: " + str(refreshInterval))
-                        count = count + 1
-                        if count > refreshInterval:
-                            break
-
-                    refresh = False
