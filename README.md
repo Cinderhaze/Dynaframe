@@ -4,3 +4,11 @@
  I've created a video of the project at: https://www.youtube.com/watch?v=2f92ypMnDEs&feature=youtu.be
  
  This is my first Python project, so feedback is much appreciated! 
+
+
+--- Notes:
+
+Create the mouse.sh script to move the mouse 'out of the way'
+- be sure to sudo apt-get install xdotools to allow cli movement of the mouse
+Use the launcher script to run dynaframe
+use the autorestart configuration to call the above and use it instead of the typical Xsession

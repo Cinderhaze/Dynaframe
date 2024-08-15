@@ -23,6 +23,7 @@ refresh = False  # controls when the frame needs to close aps and start over
 
 imagePath = "/home/pi/Pictures/usb/Pictures/"  # path to the current folder of images
 webpageEnd = ""  # the 'footer' of the webpage
+#refreshInterval = 1  # number of seconds between images in a slideshow
 refreshInterval = 10  # number of seconds between images in a slideshow
 #refreshInterval = 30  # number of seconds between images in a slideshow
 
@@ -75,8 +76,8 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             print("Dir is.....! " + qs['/?dir'][0])
 
             if qs['/?dir'][0] == "exit" :
-                os.system("killall -9 feh");
-                os.system("killall -9 omxplayer.bin")
+                os.system("killall -9 feh 1>&- 2>&-");
+                os.system("killall -9 omxplayer.bin 1>&- 2>&-")
                 global imagePath
                 imagePath = ""
                 sys.exit()
@@ -186,8 +187,8 @@ refreshPath()
 
 
 # init...clean up any other running instances
-os.system("killall -9 feh")
-os.system("killall -9 omxplayer.bin")
+os.system("killall -9 feh 1>&- 2>&-")
+os.system("killall -9 omxplayer.bin 1>&- 2>&-")
 
 MQTTSubscribe()
 
@@ -198,21 +199,27 @@ def processDir(dir):
            for filename in files
            #if os.path.splitext(filename)[1] in extensions
           ]
+  random.shuffle(files)
+  #for file in random.shuffle(files):
   for file in files:
+    print("processFile("+file+")")
     processFile(file)
   
 
 def processFile(file):
                 print("File is: " + file)
-                os.system("killall -9 feh")
-                os.system("killall -9 omxplayer.bin")
+                os.system("killall -9 feh 1>&- 2>&-")
+                os.system("killall -9 omxplayer.bin 1>&- 2>&-")
 
                 if file.upper().endswith(".MOV"):
-                    os.system('omxplayer ' + file)
-                if file.upper().endswith(".MP4"):
+                    print("omxplayer '" + file + "'")
                     os.system("omxplayer '" + file + "'")
-                if file.upper().endswith(".JPG"):
+                if file.upper().endswith(".MP4"):
+                    print("omxplayer '" + file + "'")
+                    os.system("omxplayer '" + file + "'")
+                if file.upper().endswith(".JPG") or file.upper().endswith(".JPEG"):
                     time.sleep(1.0)
+                    print("DISPLAY=:0.0 feh -x '" + file + "' -F &")
                     os.system("DISPLAY=:0.0 feh -x '" + file + "' -F &")
                     #os.system("DISPLAY=:0.0 feh -x '" + file + "' --scale-down --auto-zoom &")
                     count = 0
@@ -251,4 +258,6 @@ while True:
                   processDir(file)
                 else:
                   processFile(file)  
+            print("End of Mainloop")
+		
 
