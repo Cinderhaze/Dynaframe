@@ -156,10 +156,11 @@ print("ImagePath is: " + imagePath)
 
 time.sleep(10.0)
 # get local machine ip
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.connect(("8.8.8.8", 80))
-ip = s.getsockname()[0]
-s.close()
+#s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#s.connect(("8.8.8.8", 80))
+#ip = s.getsockname()[0]
+ip = "127.0.0.1"
+#s.close()
 
 print("Starting server at: " + ip + ":8000")
 httpd = HTTPServer((ip, 8000), SimpleHTTPRequestHandler)
@@ -190,16 +191,22 @@ refreshPath()
 os.system("killall -9 feh 1>&- 2>&-")
 os.system("killall -9 omxplayer.bin 1>&- 2>&-")
 
-MQTTSubscribe()
+#MQTTSubscribe()
 
 def processDir(dir):
   print("Dir is: " + dir)
-  files = [os.path.join(path, filename)
-           for path, dirs, files in os.walk(dir)
-           for filename in files
-           #if os.path.splitext(filename)[1] in extensions
+  #files = [os.path.join(path, filename)
+  #         for path, dirs, files in os.walk(dir)
+  #         for filename in files
+  #         #if os.path.splitext(filename)[1] in extensions
+  #        ]
+  files = [os.path.join(dp, f) 
+           for dp, dn, fn in os.walk(os.path.expanduser(dir))
+           for f in fn
           ]
+  print("files pre-shuffle:" + files)
   random.shuffle(files)
+  print("files post-shuffle" + files)
   #for file in random.shuffle(files):
   for file in files:
     print("processFile("+file+")")
@@ -238,7 +245,11 @@ def processFile(file):
                     refresh = False
 
 while True:
-            print("dirs:")
+            #print("dirs pre-shuffle:")
+            #print("dirs:")
+            #print(dirs)
+            random.shuffle(dirs)
+            print("dirs post-shuffle")
             print(dirs)
             for file in dirs:
                 print ("Mainloop: Image Path is: " + imagePath + " and has: " + str(len(imagePath)) + " files.")
