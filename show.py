@@ -23,8 +23,8 @@ refresh = False  # controls when the frame needs to close aps and start over
 
 imagePath = "/home/pi/Pictures/usb/Pictures/"  # path to the current folder of images
 webpageEnd = ""  # the 'footer' of the webpage
-#refreshInterval = 1  # number of seconds between images in a slideshow
-refreshInterval = 10  # number of seconds between images in a slideshow
+refreshInterval = 1  # number of seconds between images in a slideshow
+#refreshInterval = 10  # number of seconds between images in a slideshow
 #refreshInterval = 30  # number of seconds between images in a slideshow
 
 # webpageBody is the main template for the http served webpage. This is where you can make that page..prettier
@@ -204,9 +204,11 @@ def processDir(dir):
            for dp, dn, fn in os.walk(os.path.expanduser(dir))
            for f in fn
           ]
-  print("files pre-shuffle:" + files)
+  print("files pre-shuffle:")
+  print(files)
   random.shuffle(files)
-  print("files post-shuffle" + files)
+  print("files post-shuffle")
+  print(files)
   #for file in random.shuffle(files):
   for file in files:
     print("processFile("+file+")")
