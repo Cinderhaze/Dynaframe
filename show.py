@@ -1,4 +1,5 @@
 import os
+import shlex
 import random
 import threading 
 import time
@@ -23,8 +24,8 @@ refresh = False  # controls when the frame needs to close aps and start over
 
 imagePath = "/home/pi/Pictures/usb/Pictures/"  # path to the current folder of images
 webpageEnd = ""  # the 'footer' of the webpage
-refreshInterval = 1  # number of seconds between images in a slideshow
-#refreshInterval = 10  # number of seconds between images in a slideshow
+#refreshInterval = 1  # number of seconds between images in a slideshow
+refreshInterval = 10  # number of seconds between images in a slideshow
 #refreshInterval = 30  # number of seconds between images in a slideshow
 
 # webpageBody is the main template for the http served webpage. This is where you can make that page..prettier
@@ -89,12 +90,12 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         os.system("killall -9 omxplayer.bin")
         print("HTTPHandler - ImagePath set to: " + imagePath)
 
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(webpage.encode('UTF-8'))
-        self.wfile.write(b"<font size='30'><br><br><br>ImagePath is now: <font color='white'>" +
-                         imagePath.encode('UTF-8')
-                         + b"</color></font></body>")
+#        self.send_response(200)
+#        self.end_headers()
+#        self.wfile.write(webpage.encode('UTF-8'))
+#        self.wfile.write(b"<font size='30'><br><br><br>ImagePath is now: <font color='white'>" +
+#                         imagePath.encode('UTF-8')
+#                         + b"</color></font></body>")
 
 
 def refreshfolders():
@@ -204,11 +205,11 @@ def processDir(dir):
            for dp, dn, fn in os.walk(os.path.expanduser(dir))
            for f in fn
           ]
-  print("files pre-shuffle:")
-  print(files)
+#  print("files pre-shuffle:")
+#  print(files)
   random.shuffle(files)
   print("files post-shuffle")
-  print(files)
+#  print(files)
   #for file in random.shuffle(files):
   for file in files:
     print("processFile("+file+")")
@@ -216,25 +217,30 @@ def processDir(dir):
   
 
 def processFile(file):
-                print("File is: " + file)
+                quoted_file=shlex.quote(file)
+                print("File is: " + quoted_file)
                 os.system("killall -9 feh 1>&- 2>&-")
                 os.system("killall -9 omxplayer.bin 1>&- 2>&-")
+                cmd=''
 
                 if file.upper().endswith(".MOV"):
-                    print("omxplayer '" + file + "'")
-                    os.system("omxplayer '" + file + "'")
+                    cmd="omxplayer '" + quoted_file + "'"
+                    print(cmd)
+                    os.system(cmd)
                 if file.upper().endswith(".MP4"):
-                    print("omxplayer '" + file + "'")
-                    os.system("omxplayer '" + file + "'")
+                    cmd="omxplayer " + quoted_file
+                    print(cmd)
+                    os.system(cmd)
                 if file.upper().endswith(".JPG") or file.upper().endswith(".JPEG"):
                     time.sleep(1.0)
-                    print("DISPLAY=:0.0 feh -x '" + file + "' -F &")
-                    os.system("DISPLAY=:0.0 feh -x '" + file + "' -F &")
-                    #os.system("DISPLAY=:0.0 feh -x '" + file + "' --scale-down --auto-zoom &")
+                    cmd="DISPLAY=:0.0 feh -x " + quoted_file + " -F &"
+                    print(cmd)
+                    os.system(cmd)
+                    #os.system("DISPLAY=:0.0 feh -x " + quoted_file + " --scale-down --auto-zoom &")
                     count = 0
                     print("Showing: " + file)
                     global refresh
-                    print("refresh is: " + str(refresh))
+                    #print("refresh is: " + str(refresh))
                     print("refreshInterval is: " + str(refreshInterval))
                     while refresh is False:
                         time.sleep(1.0)
